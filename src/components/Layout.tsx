@@ -161,12 +161,13 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <nav className="fixed top-0 left-0 w-full p-6 flex justify-between items-center z-50 mix-blend-difference text-white">
         <Link
           to="/"
-          className="flex items-center"
+          className="flex items-center gap-2"
           onMouseEnter={playClick}
           data-cursor="home"
           onClick={(e) => handleNavClick(e, '/')}
         >
-          <img src="/media/logos/jodl_logo.png" alt="JODL." className="h-8 w-auto" />
+          <img src="/media/logos/jodl_logo.png" alt="JODL" className="h-8 w-auto" />
+          <span className="font-serif italic text-xl tracking-tight">JODLX.</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-8 bg-white/5 backdrop-blur-md px-6 py-2 rounded-full border border-white/10">
