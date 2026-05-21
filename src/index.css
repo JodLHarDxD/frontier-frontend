@@ -1,0 +1,422 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Space Grotesk', system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-heading: 'Bebas Neue', sans-serif;
+}
+
+@layer base {
+  :root {
+    --bg-primary: #fcfcfa;
+    --text-primary: #10100e;
+    --text-secondary: #6b6375;
+    --accent: #10100e;
+    --border: #e5e4e7;
+    --selection-bg: #c8ff2d; /* Acid yellow for light mode */
+    --selection-text: #10100e;
+    --mint: #3ee6a6;
+    --marquee-bg: #ccff00; /* Neon-lime for light mode marquee */
+  }
+
+  .dark {
+    --bg-primary: #0a0a0a;
+    --text-primary: #e5e5e5;
+    --text-secondary: #a9b4b0;
+    --accent: #3ee6a6;
+    --border: #2e303a;
+    --selection-bg: #3ee6a6;
+    --selection-text: #0a0a0a;
+    --marquee-bg: #3ee6a6; /* Mint-turquoise for dark mode marquee */
+  }
+
+  * {
+    cursor: none !important; /* Hide default cursor since we have a custom one */
+  }
+
+  html {
+    scroll-behavior: initial; /* Handled by lenis */
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    transition:
+      background-color 0.4s ease,
+      color 0.4s ease;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: var(--selection-bg);
+    color: var(--selection-text);
+  }
+}
+
+/* Custom Cursor CSS */
+.cursor-dot,
+.cursor-ring,
+.cursor-label,
+.cursor-trail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+}
+
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--accent);
+  border-radius: 50%;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+
+.cursor-ring {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  transition:
+    width 0.3s,
+    height 0.3s,
+    border-color 0.3s,
+    background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cursor-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  color: var(--bg-primary);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Page Transitions — Cinematic Clip-Path Wipe */
+.page-transition-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  display: grid;
+  place-items: center;
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  pointer-events: none;
+  clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+  will-change: clip-path;
+}
+
+/* Phase: wipe-in — slanted polygon sweeps down to cover */
+.page-transition-wipe.wipe-in {
+  animation: wipeIn 1s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+/* Phase: hold — fully covers screen */
+.page-transition-wipe.hold {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* Phase: wipe-out — slanted polygon sweeps down to reveal */
+.page-transition-wipe.wipe-out {
+  animation: wipeOut 1s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+/* Content container */
+.page-transition-wipe__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  text-align: center;
+}
+
+/* Page number */
+.page-transition-wipe__num {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  opacity: 0;
+  transform: translateY(1rem);
+}
+
+.page-transition-wipe.hold .page-transition-wipe__num,
+.page-transition-wipe.wipe-in .page-transition-wipe__num {
+  animation: labelFadeIn 0.6s cubic-bezier(0.19, 1, 0.22, 1) 0.3s forwards;
+}
+
+/* Large page label */
+.page-transition-wipe__label {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(5rem, 15vw, 12rem);
+  line-height: 0.85;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  transform: translateY(2rem) rotate(-3deg);
+}
+
+.page-transition-wipe.hold .page-transition-wipe__label,
+.page-transition-wipe.wipe-in .page-transition-wipe__label {
+  animation: labelReveal 0.8s cubic-bezier(0.19, 1, 0.22, 1) 0.15s forwards;
+}
+
+.page-transition-wipe.wipe-out .page-transition-wipe__label {
+  animation: labelFadeOut 0.4s ease forwards;
+}
+
+/* Brand mark */
+.page-transition-wipe__brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.page-transition-wipe__brand-line {
+  display: block;
+  width: 3rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.3;
+}
+
+.page-transition-wipe__brand-name {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5em;
+  opacity: 0;
+}
+
+.page-transition-wipe.hold .page-transition-wipe__brand-name,
+.page-transition-wipe.wipe-in .page-transition-wipe__brand-name {
+  animation: labelFadeIn 0.5s ease 0.5s forwards;
+}
+
+/* Loading dots */
+.page-transition-wipe__dots {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.page-transition-wipe__dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--mint, #3ee6a6);
+  opacity: 0;
+}
+
+.page-transition-wipe.hold .page-transition-wipe__dots span,
+.page-transition-wipe.wipe-in .page-transition-wipe__dots span {
+  animation: dotPulse 1.2s ease infinite;
+}
+
+.page-transition-wipe__dots span:nth-child(1) {
+  animation-delay: 0s;
+}
+.page-transition-wipe__dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.page-transition-wipe__dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+/* Keyframes */
+@keyframes wipeIn {
+  0% {
+    clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+  }
+  100% {
+    clip-path: polygon(0 0, 100% 0, 100% 130%, 0 100%);
+  }
+}
+
+@keyframes wipeOut {
+  0% {
+    clip-path: polygon(0 0, 100% 0, 100% 130%, 0 100%);
+  }
+  100% {
+    clip-path: polygon(0 100%, 100% 130%, 100% 130%, 0 100%);
+  }
+}
+
+@keyframes labelReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(2rem) rotate(-3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(0);
+  }
+}
+
+@keyframes labelFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes labelFadeOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-1.5rem);
+  }
+}
+
+@keyframes dotPulse {
+  0%,
+  80%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.noise-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Utilities */
+.clip-reveal {
+  clip-path: inset(100% 0 0 0);
+}
+
+.clip-unveil {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1.2s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.text-stroke {
+  -webkit-text-stroke: 1px var(--text-primary);
+  color: transparent;
+}
+.dark .text-stroke {
+  -webkit-text-stroke: 1px var(--bg-primary);
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-33.33%);
+  }
+}
+
+@keyframes marquee-reverse {
+  0% {
+    transform: translateX(-33.33%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}
+
+.animate-marquee-reverse {
+  animation: marquee-reverse 20s linear infinite;
+}
+
+/* Scroll Proximity Highlight Styles & Cursor-driven Highlights */
+.scroll-highlight,
+.cursor-highlight {
+  position: relative;
+  display: inline-block;
+  color: var(--text-primary);
+  transition: color 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
+  z-index: 1;
+}
+
+/* For hollow outline style by default */
+.scroll-highlight.outline-style {
+  -webkit-text-stroke: 1px var(--text-primary);
+  color: transparent;
+  transition:
+    color 0.3s cubic-bezier(0.215, 0.61, 0.355, 1),
+    -webkit-text-stroke 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+/* For blue outlined text (Work Page Archive repos) */
+.scroll-highlight.outline-style.blue-text {
+  -webkit-text-stroke: 2px #3b82f6;
+  color: transparent;
+}
+
+.dark .scroll-highlight.outline-style.blue-text {
+  -webkit-text-stroke: 2px #60a5fa;
+  color: transparent;
+}
+
+/* Slide-out highlighter marker block */
+.scroll-highlight::before,
+.cursor-highlight::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  top: 6px;
+  bottom: 6px;
+  background-color: var(--highlight-color, #c8ff2d); /* Bright neon lime-green or dynamic color */
+  z-index: -1;
+  transform: scaleX(0);
+  transform-origin: left;
+  opacity: 0; /* Completely hide when inactive to eliminate thin outlines or subpixel rendering lines */
+  transition:
+    transform 0.4s cubic-bezier(0.215, 0.61, 0.355, 1),
+    opacity 0.4s cubic-bezier(0.215, 0.61, 0.355, 1);
+  pointer-events: none;
+}
+
+/* Active Highlight state */
+.scroll-highlight.active-highlight,
+.cursor-highlight.active-highlight {
+  color: #10100e !important; /* Solid black text inside lime box */
+  -webkit-text-stroke: 0px !important;
+}
+
+.scroll-highlight.active-highlight::before,
+.cursor-highlight.active-highlight::before {
+  transform: scaleX(1);
+  opacity: 1;
+}
