@@ -143,7 +143,6 @@ export const ContactHero: React.FC = () => {
       particles.forEach((p) => {
         const dx = p.x - bx;
         const dy = p.y - by;
-        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
         
         p.explodedTime = 100; // Exploded for 100 frames
         
