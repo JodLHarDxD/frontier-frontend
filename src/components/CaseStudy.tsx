@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { codeToHtml } from 'shiki';
-import { Terminal as TerminalIcon, Cpu, Play } from 'lucide-react';
+import { Terminal as TerminalIcon, Cpu, Play, Volume2, VolumeX } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,6 +28,7 @@ export const CaseStudy: React.FC = () => {
   const [terminalText, setTerminalText] = useState('');
   const [activeMenu, setActiveMenu] = useState<'welcome' | 'runtime'>('welcome');
   const [isScanning, setIsScanning] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
 
   useEffect(() => {
     const observer = new MutationObserver(() => {
@@ -122,6 +123,32 @@ export const CaseStudy: React.FC = () => {
     };
   }, []);
 
+  // Web Speech Voice Synthesis Engine
+  const speakDialogue = (lines: string[]) => {
+    if (isMuted) return;
+    try {
+      window.speechSynthesis.cancel();
+      const textToSpeak = lines.join(' ');
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      const voices = window.speechSynthesis.getVoices();
+      
+      // Select a warm, atmospheric cybernetic female voice
+      const femaleVoice = voices.find(v => 
+        v.name.includes('Google US English') || 
+        v.name.includes('Microsoft Zira') || 
+        v.name.toLowerCase().includes('female')
+      );
+      
+      if (femaleVoice) utterance.voice = femaleVoice;
+      utterance.pitch = 1.08;
+      utterance.rate = 0.95;
+      
+      window.speechSynthesis.speak(utterance);
+    } catch (e) {
+      console.warn("Speech synthesis failed:", e);
+    }
+  };
+
   // Typewriter dialogue text effect
   useEffect(() => {
     const welcomeScript = [
@@ -173,9 +200,30 @@ export const CaseStudy: React.FC = () => {
     return () => clearTimeout(intervalId);
   }, [activeMenu]);
 
+  const handleDiagnosticsToggle = () => {
+    const nextMenu = activeMenu === 'welcome' ? 'runtime' : 'welcome';
+    setActiveMenu(nextMenu);
+
+    const script = nextMenu === 'welcome' 
+      ? [
+          "CHLOE v4.81 // ARCHITECTURAL SYNAPSE",
+          "Initializing neural core interface...",
+          "Telemetry established. Connecting to JODLX matrix.",
+          "Welcome. I am CHLOE. Let us analyze the structural grid."
+        ]
+      : [
+          "SYSTEM DIAGNOSTICS -- ACTIVE RUNTIME",
+          "ENGINE: GSAP ScrollTrigger. FPS: 60.00. CORE RENDERING: Vite plus React. LIGHTHOUSE METRICS: 100/100 Core Web Vitals"
+        ];
+    speakDialogue(script);
+  };
+
   const handleScan = () => {
     if (isScanning) return;
     setIsScanning(true);
+    speakDialogue([
+      "Executing system scan. Calibrating holographic grid metrics... Biometrics clear. Calibration complete."
+    ]);
     setTimeout(() => {
       setIsScanning(false);
     }, 2500);
@@ -280,9 +328,21 @@ export const CaseStudy: React.FC = () => {
               {/* CHLOE Android Centerpiece */}
               <div 
                 ref={faceRef}
-                className="relative w-[160px] h-[160px] md:w-[240px] md:h-[240px] rounded-full overflow-hidden border-2 border-[#c8ff2d]/40 shadow-[0_0_35px_rgba(200,255,45,0.25)] bg-black transition-transform duration-300 ease-out"
+                className="relative w-[160px] h-[160px] md:w-[240px] md:h-[240px] rounded-full overflow-hidden border-2 border-[#c8ff2d]/40 shadow-[0_0_35px_rgba(200,255,45,0.25)] bg-black transition-transform duration-300 ease-out animate-[chloe-hologram-pulse_6s_ease-in-out_infinite]"
                 style={{ transformStyle: 'preserve-3d', backfaceVisibility: 'hidden' }}
               >
+                {/* Looping video loop engine fallback */}
+                <video
+                  src="/media/videos/chloe_idle.mp4"
+                  loop
+                  muted
+                  playsInline
+                  autoPlay
+                  className="absolute inset-0 w-full h-full object-cover grayscale brightness-95 opacity-0 transition-opacity duration-500 z-10"
+                  onCanPlay={(e) => {
+                    (e.target as HTMLVideoElement).style.opacity = "0.9";
+                  }}
+                />
                 <img 
                   src="/media/images/chloe_android.png" 
                   alt="CHLOE Cybernetic Assistant" 
@@ -305,6 +365,25 @@ export const CaseStudy: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <TerminalIcon size={16} className="text-[#c8ff2d] animate-pulse" />
                   <h3 className="text-lg md:text-xl font-bold tracking-tight text-text-primary">Event-Driven Motion</h3>
+                  <button
+                    onClick={() => {
+                      const nextMute = !isMuted;
+                      setIsMuted(nextMute);
+                      if (!nextMute) {
+                        try {
+                          window.speechSynthesis.cancel();
+                          const utterance = new SpeechSynthesisUtterance("Voice interface active.");
+                          window.speechSynthesis.speak(utterance);
+                        } catch(e){}
+                      } else {
+                        window.speechSynthesis.cancel();
+                      }
+                    }}
+                    className="pointer-events-auto cursor-pointer p-1 rounded hover:text-[#c8ff2d] hover:bg-white/5 transition-colors border border-transparent hover:border-white/10"
+                    title={isMuted ? "Unmute Voice Synthesis" : "Mute Voice Synthesis"}
+                  >
+                    {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} className="text-[#c8ff2d] animate-pulse" />}
+                  </button>
                 </div>
                 <div className="text-[10px] bg-[#c8ff2d]/15 text-[#c8ff2d] border border-[#c8ff2d]/30 px-2 py-0.5 rounded tracking-widest uppercase">
                   ACTIVE
@@ -317,7 +396,7 @@ export const CaseStudy: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-4 font-mono text-[10px] md:text-xs">
                 <button
-                  onClick={() => setActiveMenu(activeMenu === 'welcome' ? 'runtime' : 'welcome')}
+                  onClick={handleDiagnosticsToggle}
                   className={`flex items-center justify-center gap-2 py-3 px-2 md:px-4 rounded-lg border font-semibold cursor-pointer transition-all duration-300 ${
                     activeMenu === 'runtime'
                       ? 'bg-[#c8ff2d] text-black border-[#c8ff2d] shadow-[0_0_15px_rgba(200,255,45,0.25)]'
