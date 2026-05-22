@@ -22,6 +22,7 @@ export const CaseStudy: React.FC = () => {
   const panel2Ref = useRef<HTMLDivElement>(null);
   const faceRef = useRef<HTMLDivElement>(null);
   const ringsRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const [highlightedCode, setHighlightedCode] = useState('');
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
@@ -120,6 +121,35 @@ export const CaseStudy: React.FC = () => {
     return () => {
       panel.removeEventListener('mousemove', handleMouseMove);
       panel.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, []);
+
+  // Bulletproof looping video auto-play and transition
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handlePlayState = () => {
+      video.style.opacity = "0.9";
+    };
+
+    video.addEventListener('play', handlePlayState);
+    video.addEventListener('playing', handlePlayState);
+    video.addEventListener('canplay', handlePlayState);
+
+    // Trigger play action programmatically
+    video.play()
+      .then(() => {
+        video.style.opacity = "0.9";
+      })
+      .catch((err) => {
+        console.warn("Video playback deferred/prevented:", err);
+      });
+
+    return () => {
+      video.removeEventListener('play', handlePlayState);
+      video.removeEventListener('playing', handlePlayState);
+      video.removeEventListener('canplay', handlePlayState);
     };
   }, []);
 
@@ -333,15 +363,13 @@ export const CaseStudy: React.FC = () => {
               >
                 {/* Looping video loop engine fallback */}
                 <video
+                  ref={videoRef}
                   src="/media/videos/chloe_idle.mp4"
                   loop
                   muted
                   playsInline
                   autoPlay
                   className="absolute inset-0 w-full h-full object-cover grayscale brightness-95 opacity-0 transition-opacity duration-500 z-10"
-                  onCanPlay={(e) => {
-                    (e.target as HTMLVideoElement).style.opacity = "0.9";
-                  }}
                 />
                 <img 
                   src="/media/images/chloe_android.png" 
