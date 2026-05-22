@@ -17,8 +17,6 @@ export const ContactHero: React.FC = () => {
     (el: HTMLElement | null) => {
       if (!el || !isInSection) return Infinity;
       const rect = el.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
       // Use closest-edge distance for better UX
       const dx = Math.max(rect.left - mousePos.x, 0, mousePos.x - rect.right);
       const dy = Math.max(rect.top - mousePos.y, 0, mousePos.y - rect.bottom);

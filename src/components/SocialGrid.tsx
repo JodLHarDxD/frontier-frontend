@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ExternalLink } from 'lucide-react';
 
 const socials = [
@@ -130,7 +130,6 @@ const SocialCard: React.FC<SocialCardProps> = ({
 export const SocialGrid: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [glowPositions, setGlowPositions] = useState<Record<number, { x: number; y: number }>>({});
-  const cardRefs = useRef<(HTMLElement | null)[]>([]);
 
   const handleCardMouseMove = useCallback((index: number, e: React.MouseEvent) => {
     const target = (e.currentTarget as HTMLElement);
